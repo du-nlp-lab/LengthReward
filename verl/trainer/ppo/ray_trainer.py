@@ -901,6 +901,14 @@ class RayPPOTrainer:
         # currently, we only support validation using the reward_function.
         if self.val_reward_fn is not None and self.config.trainer.get("val_before_train", True):
             val_metrics = self._validate()
+
+            ### Length Reward ###
+            # get the mean accuracy value
+            max_val_acc = list(val_metrics.values())[0]
+            potential = 1 - max_val_acc
+            target_acc = 1
+            #####################
+
             assert val_metrics, f"{val_metrics=}"
             pprint(f"Initial validation metrics: {val_metrics}")
             logger.log(data=val_metrics, step=self.global_steps)
@@ -1111,9 +1119,19 @@ class RayPPOTrainer:
                     if self.val_reward_fn is not None and self.config.trainer.test_freq > 0 and (is_last_step or self.global_steps % self.config.trainer.test_freq == 0):
                         with _timer("testing", timing_raw):
                             val_metrics: dict = self._validate()
+
+                            ### Length Reward ###
+                            max_val_acc = max(max_val_acc, list(val_metrics.values())[0])
+                            #####################
+
                             if is_last_step:
                                 last_val_metrics = val_metrics
                         metrics.update(val_metrics)
+
+                    ### Length Reward ###
+                    potential = min(1 - max_val_acc, potential * 0.9)
+                    target_acc = max_val_acc + potential
+                    #####################
 
                     if self.config.trainer.save_freq > 0 and (is_last_step or self.global_steps % self.config.trainer.save_freq == 0):
                         with _timer("save_checkpoint", timing_raw):
