@@ -10,4 +10,4 @@ export VLLM_ATTENTION_BACKEND=XFORMERS
 export CHECKPOINTS_DIR=checkpoints/${PROJECT_NAME}/${EXPERIMENT_NAME}
 export WANDB_INIT_TIMEOUT=120
 
-bash scripts/math_grpo_train_8h20_LP.sh
+bash scripts/math_grpo_train_8h20_LR.sh

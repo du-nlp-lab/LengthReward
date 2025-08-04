@@ -18,7 +18,7 @@ import torch
 from collections import defaultdict
 
 
-class LPRewardManager:
+class LRRewardManager:
     """The reward manager.
     """
 
@@ -84,12 +84,12 @@ class LPRewardManager:
             else:
                 reward = score
 
-#            if -1 != validataion_acc:
-#                acc_ratio = min(1, validataion_acc/target_acc) # [0,1]
-#                alpha = 0.9 + 0.1 * (1 - acc_ratio)
-#                length_ratio = min(1, valid_response_length/self.max_length) # [0,1]
-#                length_reward = 1 - min(acc_ratio**128, length_ratio)
-#                reward = reward * alpha + 1e-6 * length_reward
+            if -1 != validataion_acc:
+                acc_ratio = min(1, validataion_acc/target_acc) # [0,1]
+                alpha = 0.9 + 0.1 * (1 - acc_ratio)
+                length_ratio = min(1, valid_response_length/self.max_length) # [0,1]
+                length_reward = 1 - min(acc_ratio**128, length_ratio)
+                reward = reward * alpha + 1e-6 * length_reward
 
             reward_tensor[i, valid_response_length - 1] = reward
 
